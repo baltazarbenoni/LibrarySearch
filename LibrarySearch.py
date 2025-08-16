@@ -3,6 +3,9 @@ import os
 import webbrowser
 import re
 
+import subprocess
+import platform
+
 class Main:
 
 #DOWNLOADS FOLDER ORGANIZING
@@ -27,7 +30,7 @@ class Main:
 
     def checkFile(self, item, key):
         regex = "(" + key + ")"
-        result = re.search(regex, item)
+        result = re.search(regex, item, re.IGNORECASE)
         #IF FILE MATCHES SEARCH, ADD IT TO LIST
         if(result != None):
             self.foundFiles.append(item)
@@ -45,7 +48,11 @@ class Main:
         file = self.foundFiles[a]
         path = Path(self.source / file)
         print("opening file: " + str(path))
-        webbrowser.open_new(path)
+        #WORKS ONLY IF FILE IS IN PDF-FORMAT.
+        try:
+            webbrowser.open_new(path)
+        except:
+            print("Failed to open file!")
 
 
     def checkInput(self, input):
@@ -64,6 +71,13 @@ class Main:
             print("Input not an integer. Conducting a new search with given variable.")
             return 1 
 
+#DEFINE A FUNCTION TO CLEAR THE TERMINAL
+def clearTerminal():
+    if platform.system() == "Windows":
+        subprocess.run("cls", shell=True)
+    else:
+        subprocess.run("clear", shell=True)
+
 #INIT APP
 print("Welcome to your library search app!\n")
 instance = Main()
@@ -73,15 +87,19 @@ instance.searchKey = key
 #RUN THIS LOOP WHILE APP IS ACTIVE
 active = True
 while active: 
+    #QUIT THE APP.
+    if(instance.searchKey == "q"):
+        break
     #FIRST FILE SEARCH
     instance.fileSearch()
     found = instance.printResults()
     if(not found):
+        clearTerminal()
         key = input("No files found! Enter a new search!\n")
         instance.searchKey = key
         continue
     #THE FILES FOUND ARE PRINTED. ASK IF USER WANTS TO OPEN ONE OF THEM.
-    print("If you wish to open one of the files, enter its index to open it. Else, conduct a new search by typing something else.\n")
+    print("If you wish to open one of the files, enter its index to open it.\nElse, conduct a new search by typing something else.\n")
     #VARIABLE 'NEXTPROCESS' INDICATES WHETHER NEXT PROCESS IS SELECTED.
     # 0 MEANS NOT SELECTED OR INCORRECT INPUT
     # 1 MEANS STRING --> CONDUCT A NEW SEARCH WITH GIVEN PROMPT.
@@ -101,4 +119,5 @@ while active:
     elif(nextProcess < 3):
         instance.openFile(index)
         active = False
+    clearTerminal()
 print("See you next time!")
