@@ -15,6 +15,7 @@ class Main:
     searchKey = ""
 
     def fileSearch(self):
+        self.newSearch()
         contents = os.listdir(self.source)
         if(len(contents) == 0):
             print("The library folder is empty!\nCannot conduct search")
@@ -54,7 +55,6 @@ class Main:
         except:
             print("Failed to open file!")
 
-
     def checkInput(self, input):
         #CHECK IF VALUE IS INT
         try:
@@ -68,8 +68,12 @@ class Main:
             else:
                 return 2 
         except ValueError:
-            print("Input not an integer. Conducting a new search with given variable.")
+            #Input not an integer. Conducting a new search with given variable.
             return 1 
+
+    def newSearch(self):
+        self.foundFiles.clear() 
+
 
 #DEFINE A FUNCTION TO CLEAR THE TERMINAL
 def clearTerminal():
@@ -89,9 +93,11 @@ active = True
 while active: 
     #QUIT THE APP.
     if(instance.searchKey == "q"):
+        clearTerminal()
         break
     #FIRST FILE SEARCH
     instance.fileSearch()
+    clearTerminal()
     found = instance.printResults()
     if(not found):
         clearTerminal()
