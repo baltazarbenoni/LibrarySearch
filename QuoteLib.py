@@ -37,6 +37,10 @@ def insert(quote, author, keywords = None):
     cur.execute("INSERT INTO Library(Quote, Author) VALUES(?, ?)", row)
     con.commit()
 
+def searchAndPrint():
+    for x in searchres:
+        print(x + " \n")
+
 def search(quote = None, author = None, keywords = None):
     searched = False
     cond = ""
@@ -54,7 +58,12 @@ def search(quote = None, author = None, keywords = None):
     string = "SELECT FROM Library WHERE " + cond
     result = cur.execute(string)
     searched = True
-    return result.fetchall()
+    searchres = result.fetchall()
+    for x in searchres:
+        print(x + "\n")
+
+def printAll():
+    return 0
 
 def getFromTable(column, key):
     col = ""
@@ -65,12 +74,39 @@ def getFromTable(column, key):
         col = "Author" 
     elif(col == 3):
         col = "Keywords"
-    string = "SELECT FROM Library WHERE " + col + "='" + str(key) + "'" 
+    string = "SELECT FROM Library WHERE " + col + "(?)" 
     result = cur.execute(string, key)
     return result.fetchall()
 
 print("Welcome to quote manager and storage!\n")
-getEntryInput()
-
+x = input()
+activation = True
+while activation:
+    clearTerminal()
+    print("Select the operation you wish to perform: \n")
+    print("1 = add new quote\n")
+    print("2 = search quotes\n")
+    print("3 = remove or edit existing quote\n")
+    print("4 = show library contents\n")
+    print("q = exit application\n")
+    operation = input()
+    if(operation == "1"):
+        getEntryInput()
+    elif(operation == "2"):
+        quote = input("Enter the quote you wish to search:\n")
+        author = input("Enter the author you wish to search:\n")
+        searchres = search(quote, author)
+##        searchAndPrint()
+    elif(operation == "3"):
+        continue
+    elif(operation == "4"):
+        printAll()
+    elif(operation == "q"):
+        break
+    else:
+        print("Your input matches no operation. Try again.")
+        con = input()
+        continue
+print("See you later!")
 #con.commit()
 #We can verify that the data was inserted correctly by executing a SELECT que
