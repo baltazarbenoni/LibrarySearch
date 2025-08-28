@@ -8,7 +8,6 @@ import platform
 
 class Main:
 
-#DOWNLOADS FOLDER ORGANIZING
     h = Path.home()
     source = Path(h / "Desktop" / "Livres")
     foundFiles = list()
