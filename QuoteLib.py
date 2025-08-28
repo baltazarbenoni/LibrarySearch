@@ -29,10 +29,12 @@ def getEntryInput():
     keywords = input()
     insert(quote, author, keywords)
 
+#def remove(id):
+
 def insert(quote, author, keywords = None):
-    keywords = lambda keywords: "None" if keywords is None else str(keywords) 
-    row = (str(quote), str(author), keywords) 
-    cur.execute("INSERT INTO Library VALUES", row)
+    #keywords = lambda keywords: "None" if keywords is None else str(keywords) 
+    row = (str(quote), str(author)) 
+    cur.execute("INSERT INTO Library(Quote, Author) VALUES(?, ?)", row)
     con.commit()
 
 def search(quote = None, author = None, keywords = None):
