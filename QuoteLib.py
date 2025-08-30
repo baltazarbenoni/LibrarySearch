@@ -8,8 +8,8 @@ import platform
 h = Path.home()
 lib = Path(h / "Desktop" / "Livres" / "QuoteDatabase.db")
 searchKey = ""
-con = sqlite3.connect(lib)
-cur = con.cursor()
+connection= sqlite3.connect(lib)
+cur = connection.cursor()
 result = cur.execute("SELECT name FROM sqlite_master WHERE name='Library'")
 foundIndexes = list()
 print(result.fetchone())
@@ -45,7 +45,7 @@ def insert(quote, author, keywords = None):
     else:
         row = (str(quote), str(author), str(keywords)) 
         cur.execute("INSERT INTO Library(Quote, Author, Keywords) VALUES(?, ?, ?)", row)
-    con.commit()
+    connection.commit()
 
 def generalSearch(key):
     foundIndexes.clear() 
@@ -72,6 +72,12 @@ def printRow(id):
     print(row)
     print("\n")
 
+def getRow(id):
+    sql = "SELECT * FROM Library WHERE Id = '%i'" % int(id)
+    res = cur.execute(sql)
+    row = res.fetchone()
+    return row
+
 def printAll():
     sql = "SELECT * FROM Library" 
     res = cur.execute(sql)
@@ -93,26 +99,43 @@ def getFromTable(column, key):
     result = cur.execute(string, key)
     return result.fetchall()
 
+def quitUpdate():
+    clearTerminal()
+    print("Press enter to continue to main menu.")
+
 def update():
     id = None
-    printAll()
-    print("Here are all library contents, enter the number of the entry you wish to update.")
     while id is None:
+        printAll()
+        print("Here are all library contents, enter the number of the entry you wish to update. Press 'q' to exit.")
         id = input()
-        clearTerminal()
         try:
             id = int(id)
+            row = getRow(id)
+            if(row is None):
+                clearTerminal()
+                print("Invalid input! Try again.")
+                x = input()
+                id = None
+                continue
         except:
+            if(id == "q"):
+                quitUpdate()
+                return
             print("Invalid input, try again!")
             id = None
+            clearTerminal()
             continue
 
         print("So you wish to update the quote: \n")
         printRow(id)
-        ok = input("Press any key to continue. Press 'q' if you want to change a different entry.")
+        ok = input("Press any key to continue. Press 'q' if you want to change a different entry.\nPress 'Q' if you want to exit\n")
         if(ok == "q"):
             id = None
-        print("\n Now enter which column you want to change:")
+        elif(ok == "Q"):
+            quitUpdate()
+            return
+        print("\nNow enter which column you want to change:")
 
     column = ""
     while column == "":
@@ -123,6 +146,9 @@ def update():
             column = "Author"
         elif(column.upper() == "KEYWORDS"):
             column = "Keywords"
+        elif(column.upper() == "Q"):
+            quitUpdate()
+            return
         else:
             print("Invalid input, try again!")
             column = ""
@@ -148,6 +174,7 @@ def update():
 def updateRow(id, column, value):
     sql = "UPDATE Library SET " + column + " = '%s' WHERE Id = '%i'" % (value, id)
     cur.execute(sql)
+    connection.commit()
     print("Updated row is now: \n")
     printRow(id)
 
@@ -174,6 +201,7 @@ while activation:
         if(cont == "q"):
             break
     elif(operation == "3"):
+        clearTerminal()
         update()
         cont = input()
         if(cont == "q"):
@@ -191,7 +219,7 @@ while activation:
         cont = input()
         continue
 
-con.close()
+connection.close()
 print("See you later!")
 #con.commit()
 #We can verify that the data was inserted correctly by executing a SELECT que
