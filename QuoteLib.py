@@ -11,7 +11,7 @@ searchKey = ""
 con = sqlite3.connect(lib)
 cur = con.cursor()
 result = cur.execute("SELECT name FROM sqlite_master WHERE name='Library'")
-searchres = list()
+foundIndexes = list()
 print(result.fetchone())
 
 def clearTerminal():
@@ -22,9 +22,17 @@ def clearTerminal():
 
 def getEntryInput():
     print("Type the quote you want to enter: \n")
-    quote = input() 
+    quote = ""
+    while quote == "":
+        quote = input() 
+        if(quote == ""):
+            print("Invalid input, you must enter the quote")
     print("Type the author of the quote: \n")
-    author = input()
+    author = ""
+    while author == "":
+        author = input() 
+        if(author == ""):
+            print("Invalid input, you must enter the author")
     print("Type the keywords:")
     keywords = input()
     insert(quote, author, keywords)
@@ -33,13 +41,46 @@ def getEntryInput():
 
 def insert(quote, author, keywords = None):
     #keywords = lambda keywords: "None" if keywords is None else str(keywords) 
-    row = (str(quote), str(author)) 
-    cur.execute("INSERT INTO Library(Quote, Author) VALUES(?, ?)", row)
+    if(keywords == None):
+        row = (str(quote), str(author)) 
+        cur.execute("INSERT INTO Library(Quote, Author) VALUES(?, ?)", row)
+    else:
+        row = (str(quote), str(author), str(keywords)) 
+        cur.execute("INSERT INTO Library(Quote, Author, Keywords) VALUES(?, ?, ?)", row)
     con.commit()
 
-def searchAndPrint():
-    for x in searchres:
-        print(x + " \n")
+def generalSearch(key):
+    foundIndexes.clear() 
+    if(key is not None):
+        regex = "(" + key + ")"
+        #GET THE ROWS (IDS) WHICH MATCH THE SEARCH
+        for row in cur.execute("SELECT Id, Author, Quote, Keywords FROM Library"):
+            for a in range(1, 4):
+                item = str(row[a])
+                if(item == None):
+                    continue
+                result = re.search(regex, item, re.IGNORECASE)
+                if(result != None):
+                    foundIndexes.append(row[0])
+                    break
+        clearTerminal()
+        for x in foundIndexes:
+            printRow(x)
+
+def printRow(id):
+    sql = "SELECT * FROM Library WHERE Id = '%i'" % int(id)
+    res = cur.execute(sql)
+    row = res.fetchone()
+    print(row)
+    print("\n")
+
+def printAll():
+    sql = "SELECT * FROM Library" 
+    res = cur.execute(sql)
+    rows = res.fetchall()
+    for x in rows:
+        print(x)
+        print("\n")
 
 def search(quote = None, author = None, keywords = None):
     searched = False
@@ -61,9 +102,6 @@ def search(quote = None, author = None, keywords = None):
     searchres = result.fetchall()
     for x in searchres:
         print(x + "\n")
-
-def printAll():
-    return 0
 
 def getFromTable(column, key):
     col = ""
@@ -93,20 +131,28 @@ while activation:
     if(operation == "1"):
         getEntryInput()
     elif(operation == "2"):
-        quote = input("Enter the quote you wish to search:\n")
-        author = input("Enter the author you wish to search:\n")
-        searchres = search(quote, author)
-##        searchAndPrint()
+        clearTerminal()
+        key = input("Enter the search you wish to conduct:\n")
+        generalSearch(key)
+        cont = input()
+        if(cont == "q"):
+            break
     elif(operation == "3"):
         continue
     elif(operation == "4"):
+        clearTerminal()
         printAll()
+        cont = input()
+        if(cont == "q"):
+            break
     elif(operation == "q"):
         break
     else:
         print("Your input matches no operation. Try again.")
-        con = input()
+        cont = input()
         continue
+
+con.close()
 print("See you later!")
 #con.commit()
 #We can verify that the data was inserted correctly by executing a SELECT que
