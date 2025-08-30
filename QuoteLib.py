@@ -37,8 +37,6 @@ def getEntryInput():
     keywords = input()
     insert(quote, author, keywords)
 
-#def remove(id):
-
 def insert(quote, author, keywords = None):
     #keywords = lambda keywords: "None" if keywords is None else str(keywords) 
     if(keywords == None):
@@ -82,27 +80,6 @@ def printAll():
         print(x)
         print("\n")
 
-def search(quote = None, author = None, keywords = None):
-    searched = False
-    cond = ""
-    if(quote is not None and author is not None):
-        cond1 = "Quote='" + str(quote) + "' AND "
-        cond2 = "Author='" + str(author) + "'"
-        cond = cond1 + cond2
-    elif(quote is not None):
-        cond = "Quote='" + str(quote) + "'"
-    elif(author is not None):
-        cond = "Author='" + str(author) + "'"
-    else:
-        return
-
-    string = "SELECT FROM Library WHERE " + cond
-    result = cur.execute(string)
-    searched = True
-    searchres = result.fetchall()
-    for x in searchres:
-        print(x + "\n")
-
 def getFromTable(column, key):
     col = ""
     col = str(col).upper()
@@ -116,6 +93,65 @@ def getFromTable(column, key):
     result = cur.execute(string, key)
     return result.fetchall()
 
+def update():
+    id = None
+    printAll()
+    print("Here are all library contents, enter the number of the entry you wish to update.")
+    while id is None:
+        id = input()
+        clearTerminal()
+        try:
+            id = int(id)
+        except:
+            print("Invalid input, try again!")
+            id = None
+            continue
+
+        print("So you wish to update the quote: \n")
+        printRow(id)
+        ok = input("Press any key to continue. Press 'q' if you want to change a different entry.")
+        if(ok == "q"):
+            id = None
+        print("\n Now enter which column you want to change:")
+
+    column = ""
+    while column == "":
+        column = input()
+        if(column.upper() == "QUOTE"):
+            column = "Quote"
+        elif(column.upper() == "AUTHOR"):
+            column = "Author"
+        elif(column.upper() == "KEYWORDS"):
+            column = "Keywords"
+        else:
+            print("Invalid input, try again!")
+            column = ""
+            continue
+
+        print("So you wish to change the column %s from the quote \n" % column)
+        printRow(id)
+        ok = input("Press any key to continue. Press 'q' if you want to change a different column.")
+        if(ok == "q"):
+            column = ""
+        else:
+            clearTerminal()
+        
+    ok = "q"
+    while ok == "q":
+        print("Enter the value you wish to update the cell with:")
+        val = input()
+        print("The value you entered is: %s " % val)
+        ok = input("Press any key to continue. Press 'q' if you want to enter a different value.")
+    clearTerminal()
+    updateRow(id, column, val)
+
+def updateRow(id, column, value):
+    sql = "UPDATE Library SET " + column + " = '%s' WHERE Id = '%i'" % (value, id)
+    cur.execute(sql)
+    print("Updated row is now: \n")
+    printRow(id)
+
+#PROGRAM EXECUTION
 print("Welcome to quote manager and storage!\n")
 x = input()
 activation = True
@@ -124,7 +160,7 @@ while activation:
     print("Select the operation you wish to perform: \n")
     print("1 = add new quote\n")
     print("2 = search quotes\n")
-    print("3 = remove or edit existing quote\n")
+    print("3 = edit an existing entry\n")
     print("4 = show library contents\n")
     print("q = exit application\n")
     operation = input()
@@ -138,7 +174,10 @@ while activation:
         if(cont == "q"):
             break
     elif(operation == "3"):
-        continue
+        update()
+        cont = input()
+        if(cont == "q"):
+            break
     elif(operation == "4"):
         clearTerminal()
         printAll()
