@@ -7,7 +7,12 @@ import platform
 
 h = Path.home()
 lib = Path(h / "Desktop" / "Livres" / "QuoteDatabase.db")
-searchKey = ""
+exists = os.path.exists(lib)
+
+if(exists is False):
+    lib = Path(h / "Desktop" / "QuoteData")
+    os.mkdir(lib)
+
 connection= sqlite3.connect(lib)
 cur = connection.cursor()
 result = cur.execute("SELECT name FROM sqlite_master WHERE name='Library'")
@@ -221,5 +226,3 @@ while activation:
 
 connection.close()
 print("See you later!")
-#con.commit()
-#We can verify that the data was inserted correctly by executing a SELECT que
