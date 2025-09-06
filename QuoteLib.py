@@ -70,6 +70,25 @@ def generalSearch(key):
         for x in foundIndexes:
             printRow(x)
 
+def remove(index):
+    #ccreatePoubelle()
+    #copy = "INSERT INTO Poubelle SELECT * FROM Library WHERE Id Id = '%i'" % int(index)
+    #cur.execute(copy)
+    cur.execute("DELETE FROM Library WHERE Id = '%i'" % int(index))
+    print("Entry deleted!")
+    connection.commit()
+
+def createPoubelle():
+    sql = "SELECT * FROM sqlite_master WHERE name = 'Poubelle'"
+    cur.execute(sql)
+    result = cur.fetchone()
+    if(result):
+        return
+    else:
+        create_table = "CREATE TABLE Poubelle AS (SELECT TOP 0 * FROM Library)" 
+        cur.execute(create_table)
+        return
+
 def printRow(id):
     sql = "SELECT * FROM Library WHERE Id = '%i'" % int(id)
     res = cur.execute(sql)
@@ -132,6 +151,7 @@ def update():
             clearTerminal()
             continue
 
+        clearTerminal()
         print("So you wish to update the quote: \n")
         printRow(id)
         ok = input("Press any key to continue. Press 'q' if you want to change a different entry.\nPress 'Q' if you want to exit\n")
@@ -140,6 +160,7 @@ def update():
         elif(ok == "Q"):
             quitUpdate()
             return
+        clearTerminal()
         print("\nNow enter which column you want to change:")
 
     column = ""
@@ -159,6 +180,7 @@ def update():
             column = ""
             continue
 
+        clearTerminal()
         print("So you wish to change the column %s from the quote \n" % column)
         printRow(id)
         ok = input("Press any key to continue. Press 'q' if you want to change a different column.")
@@ -194,6 +216,7 @@ while activation:
     print("2 = search quotes\n")
     print("3 = edit an existing entry\n")
     print("4 = show library contents\n")
+    print("5 = remove an entry\n")
     print("q = exit application\n")
     operation = input()
     if(operation == "1"):
@@ -217,6 +240,20 @@ while activation:
         cont = input()
         if(cont == "q"):
             break
+    elif(operation == "5"):
+        ind = 0
+        while (ind == 0):
+            clearTerminal()
+            printAll()
+            ind = input("Enter the index of the entry you want to remove!\n")
+            try:
+                ind = int(ind)
+                remove(ind)
+            except:
+                if(ind == "q"):
+                    break
+                print("Invalid input, try again!")
+                ind == 0
     elif(operation == "q"):
         break
     else:
