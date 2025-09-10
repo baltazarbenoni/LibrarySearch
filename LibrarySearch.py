@@ -1,8 +1,8 @@
+#C 2025 Daniel Snapir alias Baltazar Benoni
 from pathlib import Path
 import os
 import webbrowser
 import re
-
 import subprocess
 import platform
 
@@ -21,7 +21,7 @@ class Main:
             return
         else:
             amount = str(len(contents))
-            print("\nSearching the pattern " + self.searchKey + "\nFrom " + amount + " files.\n")
+            print("\nSearching the pattern " + self.searchKey + "\nFrom " + amount + " of files.\n")
             for x in contents:
                 if (os.path.isfile(Path(self.source / x)) == False):
                     continue
@@ -48,7 +48,7 @@ class Main:
         file = self.foundFiles[a]
         path = Path(self.source / file)
         print("opening file: " + str(path))
-        #WORKS ONLY IF FILE IS IN PDF-FORMAT.
+        #WORKS ONLY IF FILE IS IN PDF-FORMAT (OR APPARENTLY ALSO EPUB WORKS).
         try:
             webbrowser.open_new(path)
         except:
@@ -123,6 +123,6 @@ while active:
     #OPEN THE FILE
     elif(nextProcess < 3):
         instance.openFile(index)
-        active = False
+        #active = False
     clearTerminal()
 print("See you next time!")

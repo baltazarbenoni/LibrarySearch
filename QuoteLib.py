@@ -1,3 +1,4 @@
+#C 2025 Daniel Snapir alias Baltazar Benoni
 from pathlib import Path
 import sqlite3
 import os
@@ -130,6 +131,7 @@ def quitUpdate():
 def update():
     id = None
     while id is None:
+#GET THE ENTRY WHICH TO UPDATE.
         printAll()
         print("Here are all library contents, enter the number of the entry you wish to update. Press 'q' to exit.")
         id = input()
@@ -150,7 +152,8 @@ def update():
             id = None
             clearTerminal()
             continue
-
+        
+#VERIFY THIS IS THE QUOTE TO UPDATE.
         clearTerminal()
         print("So you wish to update the quote: \n")
         printRow(id)
@@ -163,6 +166,7 @@ def update():
         clearTerminal()
         print("\nNow enter which column you want to change:")
 
+#ENTRY TO UPDATE FOUND, GET THE FIELD/COLUMN TO UPDATE.
     column = ""
     while column == "":
         column = input()
@@ -179,7 +183,8 @@ def update():
             print("Invalid input, try again!")
             column = ""
             continue
-
+        
+#VERIFY THE COLUMN TO UPDATE.
         clearTerminal()
         print("So you wish to change the column %s from the quote \n" % column)
         printRow(id)
@@ -188,7 +193,8 @@ def update():
             column = ""
         else:
             clearTerminal()
-        
+
+#GET THE INPUT / NEW VALUE.  
     ok = "q"
     while ok == "q":
         print("Enter the value you wish to update the cell with:")
